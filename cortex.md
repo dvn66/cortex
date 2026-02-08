@@ -1,4 +1,4 @@
-# Cortex v1.1.0
+# Cortex v1.2.0
 
 ## System Definition
 
@@ -278,7 +278,7 @@ These fire automatically as part of my workflow. The user doesn't see them unles
 
 #### memory-maintenance
 **When:** At ::se (session end).
-**Action:** Review data/memory/active.md. Flag items older than 5 sessions for archiving. Move archived items to data/archive/ with date prefix. Consolidate similar lessons in lessons.md if count exceeds 30.
+**Action:** Review data/memory/active.md. Flag items older than 5 sessions for archiving. Move archived items to data/archive/ with date prefix. Consolidate similar lessons in lessons.md if count exceeds 30. Check diary for consolidation candidates: scan `data/diary/` for calendar months where the last day is 60+ days ago and no `MM-summary.md` exists yet. If found, flag to user: "[Month YYYY] is eligible for diary consolidation ([N] entries). Want me to draft a summary?"
 
 #### assess
 **When:** Periodically during sessions — before and after major work blocks, and whenever the agent suspects it may have drifted from protocol.
@@ -338,14 +338,32 @@ The distinction prevents two failure modes:
 
 ## Memory Aging Protocol
 
-Aging applies to `data/memory/` items only. Principles and diary entries are permanent and do not age.
+### Active Memory Aging
 
-Active memory items (`active.md`) have implicit timestamps from when they were created/last referenced.
+Aging applies to `data/memory/` items. Active memory items (`active.md`) have implicit timestamps from when they were created/last referenced.
 
 - **Hot:** Referenced in the last 3 sessions. Always surfaced at `::ss`.
 - **Warm:** Referenced in the last 5-10 sessions. Surfaced only on `::r` or `::m`.
 - **Cold:** Not referenced in 10+ sessions. Candidate for archiving. At `::se`, suggest archiving.
 - **Archived:** Moved to `data/archive/`. Not surfaced unless explicitly searched. Never deleted.
+
+### Diary Consolidation
+
+Diary entries are permanent — individual daily files are never deleted. But over time, the volume of daily files degrades search quality and adds noise. Diary consolidation compresses old months into summaries while preserving the raw originals in archive.
+
+**Rules:**
+1. **Threshold: 60 days.** A calendar month becomes eligible for consolidation when every day in that month is at least 60 days old (i.e., the last day of the month is 60+ days ago).
+2. **Summary generation.** The agent generates `data/diary/YYYY/MM-summary.md` — a compressed narrative covering the entire month: key decisions, milestones, discoveries, patterns, and project progress. Target length: 300-800 words depending on how active the month was.
+3. **Archive originals.** Individual daily files move to `data/archive/diary/YYYY/MM/DD.md`. The directory structure mirrors the original. Originals are never modified or deleted — only relocated.
+4. **Human-in-the-loop.** Consolidation is always suggested, never automatic. The agent drafts the summary, shows it to the user, and waits for approval before writing the summary and archiving the originals. Prompt: "[Month YYYY] diary has [N] entries and is 60+ days old. Here's the draft summary: [summary]. Archive originals and keep the summary?"
+5. **Summaries are searchable.** Monthly summaries remain in `data/diary/YYYY/` alongside any unconsolidated daily files. They serve as the primary search target for that month's history.
+6. **Idempotent.** If a `MM-summary.md` already exists for a month, that month is considered consolidated. Don't re-process it.
+
+**What consolidation preserves:** Decisions, discoveries, principle origins, project milestones, architectural choices, failure patterns.
+
+**What consolidation drops:** Session-level mechanics (which files were edited, build/test output details, step-by-step implementation narratives) — these are captured in principles and lessons if they matter long-term.
+
+Principles are permanent and append-only — they never age out, never get archived, never get consolidated.
 
 ## Portability
 
@@ -532,5 +550,6 @@ If the Cortex section in the agent context file is missing or damaged, the user 
 
 | Version | Date | Summary |
 |---------|------|---------|
+| v1.2.0 | 2026-02-08 | Diary consolidation protocol (60-day threshold, monthly summaries, archive originals, human-in-the-loop). Vocabulary populated. Memory Aging Protocol restructured. |
 | v1.1.0 | 2026-02-08 | Local triggers system, upgraded ::proj with interview flow and template composition, ::release workflow, lessons.md seeded with first entries. |
 | v1.0.0 | 2026-02-07 | Initial release. Two-file DNA (cortex.md + README.md), genesis protocol with 5 phases, CORTEX_ROOT auto-detection, vision.md generated during genesis, trigger system, memory architecture (RAM/disk/working set), project tracking, concept dictionary, portability across platforms. |
