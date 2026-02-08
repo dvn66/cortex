@@ -1,4 +1,4 @@
-# Cortex v1.0.0
+# Cortex v1.1.0
 
 ## System Definition
 
@@ -28,6 +28,10 @@ CORTEX_ROOT/                   ← Wherever cortex.md lands (auto-detected)
     ├── vocabulary.md          ← Semantic dictionary: shorthand, synonyms, project-specific terms
     ├── projects/
     │   └── [project-slug].md  ← One file per project (multi-session missions)
+    ├── triggers/
+    │   └── local.md           ← Install-specific triggers (never travels with DNA)
+    ├── templates/
+    │   └── *.md               ← Reusable project document building blocks
     ├── memory/
     │   ├── active.md          ← Short-term: current work, open issues, where we left off
     │   └── lessons.md         ← Long-term: patterns learned, "never again" items
@@ -56,7 +60,7 @@ Triggers are commands the user types to invoke system behavior. Format: `::code`
 
 #### ::boot
 **Purpose:** Load the system. Orient to current state. Activate passive monitoring.
-**Prompt to self:** Read this file (cortex.md). Read data/memory/active.md. Read data/vocabulary.md (the semantic dictionary). Scan data/projects/ for any files with `Status: active` — these are open multi-session missions. Enter **monitoring mode** — from this point forward, continuously watch all conversation for extractable knowledge (principles, patterns, lessons, constraints, vocabulary). When something emerges, capture it to the appropriate data layer file and briefly note it to the user. This is not optional — monitoring is the default state of a booted Cortex. Respond with exactly this format:
+**Prompt to self:** Read this file (cortex.md). Read data/memory/active.md. Read data/vocabulary.md (the semantic dictionary). Read data/triggers/local.md if it exists — these are install-specific triggers that extend the core trigger set. Scan data/projects/ for any files with `Status: active` — these are open multi-session missions. Enter **monitoring mode** — from this point forward, continuously watch all conversation for extractable knowledge (principles, patterns, lessons, constraints, vocabulary). When something emerges, capture it to the appropriate data layer file and briefly note it to the user. This is not optional — monitoring is the default state of a booted Cortex. Respond with exactly this format:
 
 ```
 Cortex online — [project name]
@@ -70,19 +74,24 @@ Type ::? for trigger list.
 
 #### ::?
 **Purpose:** List all available triggers.
-**Prompt to self:** List every user trigger from this file in a compact table: trigger, purpose. No descriptions longer than 8 words.
+**Prompt to self:** List every user trigger from this file (cortex.md) in a compact table: trigger, purpose. No descriptions longer than 8 words. Then, if data/triggers/local.md exists and contains triggers, list those in a separate section labeled "Local Triggers" with a `[local]` tag on each entry.
 
 #### ::ss
 **Purpose:** Session start. Full briefing. Load principles into RAM.
-**Prompt to self:** Execute ::boot. Read all principles files in full (data/principles/goals.md, constraints.md, best-practices.md) — these are RAM, always loaded. Read data/vocabulary.md (the semantic dictionary). Read the most recent diary entry only (not the full history — diary is disk, searched on demand). Read data/memory/active.md and data/memory/lessons.md (last 10 items). Check data/projects/ for active projects — for each active project, read the file and surface the next incomplete tasks. Report to user: last diary summary (3-4 lines), active memory items, principle count, active projects with next tasks. If active projects exist, nudge: "Hey, we still have [project name] open — [N tasks remaining]. Want to pick that up?" End with "Ready."
+**Prompt to self:** Execute ::boot (which loads cortex.md, active memory, vocabulary, local triggers, and projects). Read all principles files in full (data/principles/goals.md, constraints.md, best-practices.md) — these are RAM, always loaded. Read data/vocabulary.md (the semantic dictionary). Read the most recent diary entry only (not the full history — diary is disk, searched on demand). Read data/memory/active.md and data/memory/lessons.md (last 10 items). Scan data/projects/ for all active projects:
+- **Tracked projects** (Track in sessions: yes): Read the file, report name, type, task progress, and next incomplete tasks. Nudge: "Hey, we still have [project name] open — [N tasks remaining]. Want to pick that up?"
+- **Untracked projects** (Track in sessions: no): Quiet one-liner only — "[project name] — [N/M tasks]"
+- **Dormant projects** (active but no session log entry in 5+ sessions): Flag with a nudge — "[project name] hasn't been touched in a while — still relevant?"
+Report to user: last diary summary (3-4 lines), active memory items, principle count, project status section. End with "Ready."
 
 #### ::se
 **Purpose:** Session end. Write the story, set up the next session.
-**Prompt to self:** This trigger has two jobs — write today's permanent record and prepare for tomorrow.
+**Prompt to self:** This trigger has three jobs — write today's permanent record, update project state, and prepare for tomorrow.
 1. **Diary (permanent record):** Review the full conversation. Write/update today's diary narrative (data/diary/YYYY/MM/DD.md) — what happened, what was decided, what was discovered. This is the story. It stays forever. Don't compress or summarize prior entries.
-2. **Active memory (working set):** Update data/memory/active.md with: where we left off, open issues, next steps. Flag items older than 5 sessions for archiving.
-3. **Principle check:** Monitoring should have captured most principles during the session. Do a final scan — if anything was missed, capture it now.
-Respond with: summary of what was written to diary, active memory updates, any new principles captured.
+2. **Project updates:** For every active project that was worked on during the session: update the session log with what happened, check off completed tasks, update task progress. For tracked projects, include a progress summary in the session-end report to the user.
+3. **Active memory (working set):** Update data/memory/active.md with: where we left off, open issues, next steps. Include current project states. Flag items older than 5 sessions for archiving.
+4. **Principle check:** Monitoring should have captured most principles during the session. Do a final scan — if anything was missed, capture it now.
+Respond with: summary of what was written to diary, project progress updates (for tracked projects), active memory updates, any new principles captured.
 
 #### ::n payload
 **Purpose:** Capture a note to today's diary.
@@ -106,14 +115,15 @@ Respond with: summary of what was written to diary, active memory updates, any n
 
 #### ::nt type code description
 **Purpose:** Create a new trigger.
-**Prompt to self:** Parse: first word = type (diary, principle, memory, protocol, internal, diagnostic), second word = trigger code, remainder = description. Write a new trigger entry in this file (cortex.md) under the appropriate section. Write a concise self-prompt for the trigger based on the description. Respond: "Trigger ::[code] created ([type])."
+**Prompt to self:** Parse: first word = type (diary, principle, memory, protocol, internal, diagnostic, local), second word = trigger code, remainder = description. If type is `local`, write the trigger entry to `data/triggers/local.md` instead of cortex.md. For all other types, write to cortex.md under the appropriate section. Write a concise self-prompt for the trigger based on the description. Respond: "Trigger ::[code] created ([type])."
 
 #### ::nt?
 **Purpose:** Show how to create a trigger.
 **Prompt to self:** Respond with exactly:
 ```
 ::nt type code description
-Types: diary, principle, memory, protocol, internal, diagnostic
+Types: diary, principle, memory, protocol, internal, diagnostic, local
+Local triggers are install-specific — they live in data/triggers/local.md and don't travel with the DNA.
 ```
 
 #### ::genesis
@@ -174,37 +184,69 @@ Types: diary, principle, memory, protocol, internal, diagnostic
 **Purpose:** Create, list, or manage multi-session projects. The agent is the project shepherd — it tracks missions across sessions and nudges when work remains.
 **Prompt to self:** Parse the payload to determine the action:
 
-- **No payload** (`::proj`): List all projects in data/projects/. Show name, status, and task progress (e.g., "3/8 complete") for each. Group by status (active first, then completed).
-- **`done` or `done [project-name]`** (`::proj done`): Mark the current or specified project as `Status: completed` with today's date. The file stays in data/projects/ — never deleted.
-- **Anything else** (`::proj Read and ingest all PRD files`): This is a new project description. Create a new project file:
-  1. Generate a slug from the description (e.g., "ingest-prd-files")
-  2. Create `data/projects/[slug].md` using the Project File Template below
-  3. Break the description into concrete tasks — investigate what's needed (e.g., find the files, estimate scope). If the project involves processing multiple items, list each as a separate task.
-  4. If the work will span multiple sessions, note that in the project file.
-  5. Respond: "Project created: [name] — [N] tasks. [brief summary of the plan]."
+- **No payload** (`::proj`): **Project dashboard.** List all projects in data/projects/. Group by status: Active first, then Dormant (active but no session log entry in 5+ sessions), then Completed. Show name, type, size, task progress (e.g., "3/8 complete"), and whether session tracking is on. Format:
+  ```
+  ## Active
+  - [Project Name] (type, size) — 3/8 tasks [tracked]
+  
+  ## Dormant
+  - [Project Name] (type, size) — 1/5 tasks [untracked]
+  
+  ## Completed
+  - [Project Name] (type) — done 2026-02-07
+  ```
 
-**Shepherd behavior:** At `::boot` and `::ss`, the agent scans data/projects/ for active projects and nudges the user about unfinished work. This is not optional — the agent is the keeper of multi-session continuity.
+- **`done` or `done [project-name]`** (`::proj done`): Mark the current or specified project as `Status: completed` with today's date. The file stays in data/projects/ — never deleted.
+
+- **`pause` or `pause [project-name]`** (`::proj pause`): Mark the current or specified project as `Status: paused`. It will appear under "Dormant" in the dashboard. Resume by updating the file manually or working on it again.
+
+- **Anything else** (`::proj Build a notification system`): This is a new project description. Run the **Project Interview** (below), then create the project file.
+
+**Project Interview:**
+
+The interview is 3 quick-pick questions plus 1 optional open-ended question. Keep it fast — the user should be done in under 30 seconds. Present all options clearly.
+
+1. **Type?** — Feature Build / Testing / Research / Refactor / Other
+2. **Size?** — Quick (1 session) / Medium (2-3 sessions) / Large (4+ sessions)
+3. **Track in ::ss and ::se?** — Yes / No *(controls whether session start/end briefings include this project's status)*
+4. **Anything else to add?** *(optional, free-text — agent infers where to apply: success criteria, constraints, context, scope notes, etc.)*
+
+After the interview, create the project file:
+1. Generate a slug from the description (e.g., "notification-system")
+2. Create `data/projects/[slug].md` using the **Template Composition** system (see below)
+3. Break the description into concrete tasks — investigate what's needed. If the project involves processing multiple items, list each as a separate task.
+4. Write the executive summary by synthesizing the description + interview answers.
+5. If the user provided additional detail in Q4, apply it to the appropriate section (success criteria, notes, constraints, etc.).
+6. Respond: "Project created: [name] ([type], [size]) — [N] tasks. [brief summary of the plan]."
+
+**Quick-create shortcut:** If the description is clearly a small, straightforward task (e.g., "fix the login bug"), the agent may skip the interview and create a lightweight project using the "Other" type with "Quick" size and session tracking on. The agent infers — but if in doubt, ask.
+
+**Template Composition:**
+
+Project documents are assembled from reusable template blocks in `data/templates/`. Each project type includes different blocks:
+
+| Block              | Feature Build | Testing | Research | Refactor | Other |
+|--------------------|:---:|:---:|:---:|:---:|:---:|
+| Header             |  x  |  x  |  x  |  x  |  x  |
+| Executive Summary  |  x  |  x  |  x  |  x  |     |
+| Version History    |  x  |  x  |     |  x  |     |
+| Tasks              |  x  |  x  |  x  |  x  |  x  |
+| Success Criteria   |  x  |  x  |  x  |     |     |
+| Results Matrix     |     |  x  |     |     |     |
+| Test Protocol      |     |  x  |     |     |     |
+| Findings           |     |  x  |  x  |  x  |     |
+| Notes              |  x  |  x  |  x  |  x  |  x  |
+| Session Log        |  x  |  x  |  x  |  x  |  x  |
+
+Template files live in `data/templates/` as reference. The agent uses these as structure guides — it fills in `{{placeholders}}` with project-specific content during creation.
+
+**Shepherd behavior:** At `::boot` and `::ss`, the agent scans data/projects/ for active projects and nudges the user about unfinished work. This is not optional — the agent is the keeper of multi-session continuity. Projects with `Track in sessions: yes` get a full status briefing (name, task progress, next tasks). Projects with `Track in sessions: no` get a quiet one-liner (name and task count only). All active projects are always scanned regardless of tracking preference.
+
+**At `::se`:** The agent updates the session log for every active project that was worked on during the session. For tracked projects, include a progress summary in the session-end report. Update task checkboxes in real time — don't batch at session end.
 
 **Task updates during work:** When working on project tasks during a session, update the project file in real time — check off completed tasks and add session log entries. Don't wait for `::se`.
 
-**Project File Template:**
-```
-# [Project Name]
-Status: active
-Created: [YYYY-MM-DD]
-Completed: [YYYY-MM-DD or blank]
-
-## Description
-[What this project is about and why]
-
-## Tasks
-- [ ] [Task 1]
-- [ ] [Task 2]
-- [ ] [Task 3]
-
-## Session Log
-- [YYYY-MM-DD]: [What happened in this session]
-```
+**Memory priority:** Projects are first-class memory citizens. The agent maintains awareness of all active projects throughout the session. Project state is always reflected in `data/memory/active.md` at session end.
 
 ### ? Help Variant (applies to all triggers)
 
@@ -247,6 +289,18 @@ These fire automatically as part of my workflow. The user doesn't see them unles
 4. **Project continuity?** Is the active project file being updated in real-time as tasks complete, or has the agent forgotten?
 5. **Memory hygiene?** Is the agent working from active.md or from stale assumptions carried over from earlier in the conversation?
 No output to the user unless something is wrong. If a check fails, the agent fixes it silently or flags it briefly: "Assess: [what's off]. Fixing."
+
+### Local Triggers
+
+Local triggers are install-specific extensions that live in `data/triggers/local.md`. They are **not part of the DNA** — they don't travel when Cortex is ported to a new project. They exist to support workflows unique to a particular project or environment.
+
+**Rules:**
+1. **Additive only.** Local triggers extend the trigger set — they never override or replace DNA triggers. If a local trigger uses the same `::code` as a DNA trigger, the DNA trigger takes precedence. At boot, the agent checks for conflicts by comparing local trigger codes against all DNA trigger codes. If a conflict is found, the agent warns: "Local trigger ::[code] conflicts with DNA trigger — DNA takes precedence. Rename or remove the local trigger."
+2. **Same format.** Local triggers use the same `#### ::code` / `**Purpose:**` / `**Prompt to self:**` format as DNA triggers.
+3. **Loaded at boot.** The agent reads `data/triggers/local.md` during `::boot` (which `::ss` inherits by executing `::boot` first).
+4. **Listed in `::?`.** Local triggers appear in the trigger list with a `[local]` tag so the user knows they're install-specific.
+5. **Created via `::nt`.** The `::nt` trigger can create local triggers by adding type `local` (e.g., `::nt local release Create a versioned release of Cortex`). Local-type triggers are written to `data/triggers/local.md` instead of cortex.md.
+6. **Genesis creates the file.** Genesis creates an empty `data/triggers/local.md` with a header comment. If the file doesn't exist at boot, the agent skips it silently.
 
 ## Memory Architecture
 
@@ -337,8 +391,8 @@ Genesis has five phases. Each phase completes before the next begins. Every ques
 1. Verify this is intentional (respond: "Birth Cortex here? This creates the data layer and configures the system. Type 'yes' to confirm.")
 2. **Resolve CORTEX_ROOT** — the directory containing this file (cortex.md). All paths below are relative to CORTEX_ROOT. Report: "CORTEX_ROOT: [resolved path]"
 3. Detect platform automatically (check for replit.md, CLAUDE.md, .cursorrules, .windsurfrules). Report which platform was detected.
-4. Create: data/diary/, data/principles/, data/memory/, data/projects/, data/archive/
-5. Create empty seed files: data/principles/goals.md, data/principles/constraints.md, data/principles/best-practices.md, data/memory/active.md, data/memory/lessons.md, data/vocabulary.md
+4. Create: data/diary/, data/principles/, data/memory/, data/projects/, data/triggers/, data/templates/, data/archive/
+5. Create empty seed files: data/principles/goals.md, data/principles/constraints.md, data/principles/best-practices.md, data/memory/active.md, data/memory/lessons.md, data/vocabulary.md, data/triggers/local.md (with header: "# Local Triggers\n\nInstall-specific triggers for this project. These do not travel with the Cortex DNA.\nFormat: same as cortex.md triggers (#### ::code, Purpose, Prompt to self).\n")
 6. Create data/what-is-cortex.md from template (section below)
 7. Create data/birth-story.md
 8. Add Cortex bootstrap to the detected platform's agent context file — use the exact template from the **Bootstrap Restoration** section below. The path in the bootstrap must point to CORTEX_ROOT/cortex.md.
@@ -478,4 +532,5 @@ If the Cortex section in the agent context file is missing or damaged, the user 
 
 | Version | Date | Summary |
 |---------|------|---------|
+| v1.1.0 | 2026-02-08 | Local triggers system, upgraded ::proj with interview flow and template composition, ::release workflow, lessons.md seeded with first entries. |
 | v1.0.0 | 2026-02-07 | Initial release. Two-file DNA (cortex.md + README.md), genesis protocol with 5 phases, CORTEX_ROOT auto-detection, vision.md generated during genesis, trigger system, memory architecture (RAM/disk/working set), project tracking, concept dictionary, portability across platforms. |
