@@ -285,7 +285,7 @@ These fire automatically as part of my workflow. The user doesn't see them unles
 **When:** Periodically during sessions — before and after major work blocks, and whenever the agent suspects it may have drifted from protocol.
 **Action:** Silent self-diagnostic. Check:
 1. **Principles loaded?** Were goals.md, constraints.md, best-practices.md actually read this session, or is the agent operating on assumptions?
-2. **Bootstrap intact?** Quick verify that the Cortex section in replit.md hasn't been clobbered by a rewrite.
+2. **Bootstrap intact?** Quick verify that the Cortex section in the agent context file for this platform (see Platform Adaptation table) hasn't been clobbered by a rewrite.
 3. **Monitoring active?** Has the agent been capturing principles/vocabulary/lessons during conversation, or has it gone heads-down and stopped noticing?
 4. **Project continuity?** Is the active project file being updated in real-time as tasks complete, or has the agent forgotten?
 5. **Memory hygiene?** Is the agent working from active.md or from stale assumptions carried over from earlier in the conversation?
@@ -392,9 +392,12 @@ The only platform-specific piece is the bootstrap hook — the file where the ag
 | Claude Code | `CLAUDE.md` | Read automatically by Claude |
 | Cursor | `.cursorrules` | Read automatically by Cursor |
 | Windsurf | `.windsurfrules` | Read automatically by Windsurf |
+| Base44 | `agents/` context | Restricted file system — see below |
 | Other | Project README or equivalent | Wherever the agent looks for context |
 
 The bootstrap template content stays the same across platforms — only the target file and the path to cortex.md change. The path in the bootstrap must point to wherever cortex.md actually lives in the project.
+
+**Restricted file system platforms:** Some platforms (e.g., Base44) only allow writes to specific directories. On these platforms, place the DNA files inside an allowed directory and use that as CORTEX_ROOT. For Base44, use `agents/cortex/` — genesis copies the DNA there and builds the data layer under `agents/cortex/data/`. The bootstrap points to that path.
 
 ## Genesis Protocol
 
@@ -409,7 +412,7 @@ Genesis has five phases. Each phase completes before the next begins. Every ques
 
 1. Verify this is intentional (respond: "Birth Cortex here? This creates the data layer and configures the system. Type 'yes' to confirm.")
 2. **Resolve CORTEX_ROOT** — the directory containing this file (cortex.md). All paths below are relative to CORTEX_ROOT. Report: "CORTEX_ROOT: [resolved path]"
-3. Detect platform automatically (check for replit.md, CLAUDE.md, .cursorrules, .windsurfrules). Report which platform was detected.
+3. Detect platform automatically (check for replit.md, CLAUDE.md, .cursorrules, .windsurfrules, or Base44's `agents/` directory). Report which platform was detected. If the platform has a restricted file system (see Platform Adaptation), relocate the DNA: copy cortex.md and README.md into the allowed directory (e.g., `agents/cortex/` on Base44), update CORTEX_ROOT to that path, and report the relocation.
 4. Create: data/diary/, data/principles/, data/memory/, data/projects/, data/triggers/, data/templates/, data/archive/
 5. Create empty seed files: data/principles/goals.md, data/principles/constraints.md, data/principles/best-practices.md, data/memory/active.md, data/memory/lessons.md, data/vocabulary.md, data/triggers/local.md (with header: "# Local Triggers\n\nInstall-specific triggers for this project. These do not travel with the Cortex DNA.\nFormat: same as cortex.md triggers (#### ::code, Purpose, Prompt to self).\n")
 6. Create data/what-is-cortex.md from template (section below)
