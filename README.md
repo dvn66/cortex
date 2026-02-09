@@ -48,19 +48,42 @@ Genesis runs a short interview (3 questions), scans your project (with permissio
 
 The agent enters **monitoring mode** after boot — it passively captures principles, vocabulary, and lessons as they emerge in conversation. You don't have to explicitly tell it to remember things.
 
-## Platform Support
+## Platform Compatibility
 
-Cortex works with any AI coding assistant that reads a context file:
+Cortex works with any AI coding assistant that reads a context file. Genesis auto-detects your platform and writes the bootstrap hook to the right file.
 
-| Platform | Context File | Status |
-|----------|-------------|--------|
-| Replit | `replit.md` | Tested |
-| Claude Code | `CLAUDE.md` | Supported |
-| Cursor | `.cursorrules` | Supported |
-| Windsurf | `.windsurfrules` | Supported |
-| Other | Any project README | Adaptable |
+**Last updated:** 2026-02-09 | **Cortex version:** v1.5.0
 
-Genesis auto-detects your platform and writes the bootstrap hook to the right file.
+### Test Categories
+
+| Code | Test | What it validates |
+|------|------|-------------------|
+| T1 | Genesis | Data layer creation, platform detection, interview, self-test |
+| T2 | Boot | System loads, reads memory, enters monitoring mode |
+| T3 | Triggers | Core triggers fire correctly |
+| T4 | Persistence | Files written during session readable in next session |
+| T5 | Continuity | Session end then session start restores context |
+| T6 | Monitoring | Passive capture of principles/vocabulary during conversation |
+
+### Results
+
+| Platform | Type | Context File | T1 | T2 | T3 | T4 | T5 | T6 | Verdict |
+|----------|------|-------------|----|----|----|----|----|----|---------|
+| Replit | Cloud IDE | `replit.md` | -- | -- | -- | -- | -- | -- | -- |
+| Cursor | Desktop IDE | `.cursorrules` | -- | -- | -- | -- | -- | -- | -- |
+| Windsurf | Desktop IDE | `.windsurfrules` | -- | -- | -- | -- | -- | -- | -- |
+| Claude Code | Terminal CLI | `CLAUDE.md` | -- | -- | -- | -- | -- | -- | -- |
+| Bolt.new | Cloud | TBD | -- | -- | -- | -- | -- | -- | -- |
+| Lovable | Cloud | TBD | -- | -- | -- | -- | -- | -- | -- |
+| v0 | Cloud | TBD | -- | -- | -- | -- | -- | -- | -- |
+| VibeCodeApp | Mobile/Web | TBD | -- | -- | -- | -- | -- | -- | -- |
+| Cline | VS Code ext | TBD | -- | -- | -- | -- | -- | -- | -- |
+| Aider | Terminal CLI | TBD | -- | -- | -- | -- | -- | -- | -- |
+
+**Scoring:** Pass / Partial (works with workaround) / Fail / N/A / -- (not yet tested)
+**Verdict:** Compatible (T1-T6 all Pass/Partial) | Usable (T1-T4 Pass/Partial) | Incompatible (T1 or T2 Fail)
+
+Full platform profiles and research: see `docs/prd-agentic-platform-landscape.md`.
 
 ## Why Not Just Use a Long System Prompt?
 
@@ -102,6 +125,7 @@ The `data/` directory is yours — project-specific, never committed back to thi
 | `::proj` | List/create/manage multi-session projects |
 | `::ingest` | Absorb recent context into permanent knowledge |
 | `::verbatim` | Raw copy of recent exchanges |
+| `::update` | Check for and apply DNA updates |
 | `::?` | Show all triggers |
 
 ## License

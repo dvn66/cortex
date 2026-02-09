@@ -1,0 +1,6 @@
+# Best Practices
+
+- **PRD interface contracts (2026-02-07):** Every API boundary in a PRD should have exact TypeScript request/response shapes defined — no "TBD" or undefined response types. This prevents implementation ambiguity and reduces back-and-forth during build.
+- **Validate all write endpoints (2026-02-08):** Every POST and PUT endpoint must have Zod schema validation on the request body — not just create endpoints. Architect review caught missing validation on update endpoints that would have accepted malformed data silently.
+- **Always include error states (2026-02-08):** Every page that fetches data must handle three states: loading (skeleton), error (message with context), and success (data). Loading-only handling leaves users on a blank screen when APIs fail.
+- **::release GitHub push (2026-02-08):** No git remote is configured in this Replit project. Use the Octokit API via the Replit GitHub integration to push. Only push DNA files (cortex.md, README.md) to `dvn66/cortex` — the repo contains only the portable DNA, not the full app. Use the Git Trees API to create a commit and update the ref. Then create a GitHub Release (POST to `/repos/{owner}/{repo}/releases`) with the tag, release name, and changelog body — pushing a commit alone does not create a release.

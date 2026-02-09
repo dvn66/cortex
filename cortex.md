@@ -1,4 +1,4 @@
-# Cortex v1.4.0
+# Cortex v1.5.0
 
 ## System Definition
 
@@ -60,7 +60,7 @@ Triggers are commands the user types to invoke system behavior. Format: `::code`
 
 #### ::boot
 **Purpose:** Load the system. Orient to current state. Activate passive monitoring.
-**Prompt to self:** Read this file (cortex.md). Read data/memory/active.md. Read data/memory/lessons.md. Read data/vocabulary.md (the semantic dictionary). Read data/triggers/local.md if it exists — these are install-specific triggers that extend the core trigger set. Scan data/projects/ for any files with `Status: active` — these are open multi-session missions. Enter **monitoring mode** — from this point forward, continuously watch all conversation for extractable knowledge (principles, patterns, lessons, constraints, vocabulary). When something emerges, capture it to the appropriate data layer file and briefly note it to the user. This is not optional — monitoring is the default state of a booted Cortex. **Monitoring verification:** Set monitoring status to `failed` by default. Only set it to `active` after successfully reading active.md, lessons.md, and vocabulary.md. The verified line includes a passphrase from this DNA — the agent can only produce it if cortex.md was actually loaded. Respond with exactly this format:
+**Prompt to self:** Read this file (cortex.md). Read data/memory/active.md. Read data/memory/lessons.md. Read data/vocabulary.md (the semantic dictionary). Read data/triggers/local.md if it exists — these are install-specific triggers that extend the core trigger set. Scan data/projects/ for any files with `Status: active` — these are open multi-session missions. Enter **monitoring mode** — from this point forward, continuously watch all conversation for extractable knowledge (principles, patterns, lessons, constraints, vocabulary). When something emerges, capture it to the appropriate data layer file and briefly note it to the user. This is not optional — monitoring is the default state of a booted Cortex. **Monitoring verification:** Set monitoring status to `failed` by default. Only set it to `active` after successfully reading active.md, lessons.md, and vocabulary.md. The verified line includes a passphrase from this DNA — the agent can only produce it if cortex.md was actually loaded. **Version check (optional):** If the platform supports fetching URLs, check line 1 of `https://raw.githubusercontent.com/dvn66/cortex/main/cortex.md` for the latest version. If the local version is behind, include the update notice in the output. If the fetch fails or the platform doesn't support it, silently skip — never error on version check. Respond with exactly this format:
 
 ```
 Cortex online — [project name]
@@ -69,6 +69,7 @@ Last diary: [date of most recent diary entry, or "none"]
 [if active projects exist: "Active projects: [count] — [names]. Want to continue?"]
 [if all data layer reads succeeded: "Monitoring: active — context will survive"]
 [if any data layer read failed: "Monitoring: failed — re-run ::boot"]
+[if local version < remote version: "Update available: vX.Y.Z → vA.B.C — run ::update"]
 
 Type ::? for trigger list.
 ```
@@ -248,6 +249,42 @@ Template files live in `data/templates/` as reference. The agent uses these as s
 **Task updates during work:** When working on project tasks during a session, update the project file in real time — check off completed tasks and add session log entries. Don't wait for `::se`.
 
 **Memory priority:** Projects are first-class memory citizens. The agent maintains awareness of all active projects throughout the session. Project state is always reflected in `data/memory/active.md` at session end.
+
+#### ::update
+**Purpose:** Check for and apply Cortex DNA updates from GitHub.
+**Prompt to self:** This trigger checks for a newer version of cortex.md on GitHub and offers to update. Follow these steps:
+
+1. **Read local version.** Get the version from line 1 of this file (`# Cortex vX.Y.Z`).
+2. **Fetch remote version.** Fetch `https://raw.githubusercontent.com/dvn66/cortex/main/cortex.md` from GitHub. Read the first line to extract the remote version number. If the fetch fails, respond: "Couldn't reach GitHub — check your connection and try again."
+3. **Compare versions.** Parse both version strings as semver.
+   - If local >= remote: Respond: "You're on Cortex vX.Y.Z (latest)." and stop.
+   - If local < remote: Continue to step 4.
+4. **Fetch release notes.** If only one version behind, fetch the GitHub Release for the remote version from `https://api.github.com/repos/dvn66/cortex/releases/tags/vA.B.C`. If multiple versions behind, fetch the full release list from `https://api.github.com/repos/dvn66/cortex/releases` (returns all releases sorted newest-first), filter to releases with tag names between the local version (exclusive) and the remote version (inclusive), and collect their release bodies. If any fetch fails, note "Release notes unavailable" but still offer the update.
+5. **Show update summary.** Present to user:
+   ```
+   Update available
+   Current: vX.Y.Z
+   Latest:  vA.B.C
+
+   What's new:
+   [If one version: display the Added/Changed/Fixed/Removed sections from the GitHub Release body.]
+   [If multiple versions skipped: display each version's changelog under its version header, in chronological order (oldest first). Example: "### v1.4.0" followed by its changes, then "### v1.5.0" followed by its changes.]
+   [If release notes unavailable: "Release notes unavailable — review releases at github.com/dvn66/cortex/releases"]
+
+   This will replace cortex.md only. Your data/ directory (memory, diary, projects, principles) will not be touched.
+   ```
+6. **Ask for confirmation.** "Apply update? (yes/no)"
+7. **On confirmation:** Replace the local cortex.md with the fetched version. Do NOT modify anything in the `data/` directory. Respond:
+   ```
+   Updated Cortex vX.Y.Z → vA.B.C
+   Run ::boot to load the new version.
+   ```
+8. **On decline:** Respond: "Update skipped. You can run ::update anytime."
+
+**Safety rules:**
+- NEVER modify the `data/` directory during an update. The data layer is install-specific and must survive DNA upgrades.
+- Always show the user what changed before replacing.
+- Always get explicit confirmation before replacing cortex.md.
 
 ### ? Help Variant (applies to all triggers)
 
