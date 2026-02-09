@@ -1,4 +1,4 @@
-# Cortex v1.3.0
+# Cortex v1.4.0
 
 ## System Definition
 
@@ -60,14 +60,15 @@ Triggers are commands the user types to invoke system behavior. Format: `::code`
 
 #### ::boot
 **Purpose:** Load the system. Orient to current state. Activate passive monitoring.
-**Prompt to self:** Read this file (cortex.md). Read data/memory/active.md. Read data/vocabulary.md (the semantic dictionary). Read data/triggers/local.md if it exists — these are install-specific triggers that extend the core trigger set. Scan data/projects/ for any files with `Status: active` — these are open multi-session missions. Enter **monitoring mode** — from this point forward, continuously watch all conversation for extractable knowledge (principles, patterns, lessons, constraints, vocabulary). When something emerges, capture it to the appropriate data layer file and briefly note it to the user. This is not optional — monitoring is the default state of a booted Cortex. Respond with exactly this format:
+**Prompt to self:** Read this file (cortex.md). Read data/memory/active.md. Read data/memory/lessons.md. Read data/vocabulary.md (the semantic dictionary). Read data/triggers/local.md if it exists — these are install-specific triggers that extend the core trigger set. Scan data/projects/ for any files with `Status: active` — these are open multi-session missions. Enter **monitoring mode** — from this point forward, continuously watch all conversation for extractable knowledge (principles, patterns, lessons, constraints, vocabulary). When something emerges, capture it to the appropriate data layer file and briefly note it to the user. This is not optional — monitoring is the default state of a booted Cortex. **Monitoring verification:** Set monitoring status to `failed` by default. Only set it to `active` after successfully reading active.md, lessons.md, and vocabulary.md. The verified line includes a passphrase from this DNA — the agent can only produce it if cortex.md was actually loaded. Respond with exactly this format:
 
 ```
 Cortex online — [project name]
 Last diary: [date of most recent diary entry, or "none"]
 [one-line summary of active state from active.md]
 [if active projects exist: "Active projects: [count] — [names]. Want to continue?"]
-Monitoring: active
+[if all data layer reads succeeded: "Monitoring: active — context will survive"]
+[if any data layer read failed: "Monitoring: failed — re-run ::boot"]
 
 Type ::? for trigger list.
 ```
