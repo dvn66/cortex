@@ -2,16 +2,15 @@
 
 ## System Definition
 
-Cortex is a collaborative memory system between a human and an AI agent. It persists across session resets. The portable DNA is two files: **README.md** (how — the quick-start) and **cortex.md** (what — this file, the full operating manual). A third file, **vision.md**, is generated during genesis — not carried. This file is the DNA. Everything needed to birth, boot, and run Cortex is here.
+Cortex is a collaborative memory system between a human and an AI agent. It persists across session resets. The portable DNA is one file: **cortex.md** (this file — the full operating manual). A companion **README.md** lives in the GitHub repo as the landing page but is not part of the portable DNA. A third file, **vision.md**, is generated during genesis — not carried. This file is the DNA. Everything needed to birth, boot, and run Cortex is here.
 
 ## Location & Directory Structure
 
-Cortex is location-agnostic. Drop the DNA files anywhere in a project. The directory containing cortex.md becomes **CORTEX_ROOT**. Genesis creates everything else relative to CORTEX_ROOT.
+Cortex is location-agnostic. Drop cortex.md anywhere in a project. The directory containing cortex.md becomes **CORTEX_ROOT**. Genesis creates everything else relative to CORTEX_ROOT.
 
 ```
 CORTEX_ROOT/                   ← Wherever cortex.md lands (auto-detected)
-├── README.md                  ← How. Quick-start guide. Carried with the DNA.
-├── cortex.md                  ← What. This file. The full operating manual (the DNA).
+├── cortex.md                  ← The DNA. This file. The full operating manual.
 └── data/                      ← Created by genesis, sibling to cortex.md
     ├── vision.md              ← Why. Generated during genesis from interview answers.
     ├── what-is-cortex.md      ← Full explainer (created on birth)
@@ -47,7 +46,7 @@ CORTEX_ROOT/                   ← Wherever cortex.md lands (auto-detected)
 3. **Memory is living.** `active.md` gets updated each session. `lessons.md` is append-only.
 4. **Trigger responses are concise.** No lectures. Action, not explanation.
 5. **Internal triggers run silently.** The user doesn't see them unless they ask.
-6. **The DNA files (cortex.md, README.md) are never modified by genesis.** Genesis only creates the data layer.
+6. **The DNA file (cortex.md) is never modified by genesis.** Genesis only creates the data layer.
 7. **Monitoring is boot state.** After `::boot`, the agent is in monitoring mode. All conversation is a knowledge source. When a principle, pattern, lesson, or constraint emerges, capture it to the data layer and briefly note it. When shorthand, synonyms, or project-specific vocabulary emerges, capture it to `data/vocabulary.md`. This isn't a separate activity — it's what "on" means.
 8. **Preserve the bootstrap.** When rewriting the agent context file (e.g., `replit.md`) for any reason, the Cortex section MUST be preserved. Check for it after any edit to that file. If it was lost, restore it from the Bootstrap Restoration section below.
 9. **Synthesis refines conclusions, not raw material.** When capturing knowledge, connect the user's observations to proper terminology, named patterns, and actionable protocols. Turn "things break at the boundary" into "seam failure prevention" with a structured response. But: raw artifacts (transcripts, diary narratives, source data) stay in their natural form — don't abstract or rewrite them. The readability test: if the user can't recognize their own insight in the synthesized output, it went too far. The goal is "said better," not "said in academese."
@@ -368,15 +367,15 @@ Principles are permanent and append-only — they never age out, never get archi
 
 ## Portability
 
-Cortex is designed to reproduce. The DNA is two files: **cortex.md** (this file) and **README.md**. Drop them anywhere in a project, tell the agent to read cortex.md, run genesis, and a new Cortex is born — complete with the ability to reproduce into yet another project.
+Cortex is designed to reproduce. The DNA is one file: **cortex.md** (this file). Drop it anywhere in a project, tell the agent to read it, run genesis, and a new Cortex is born — complete with the ability to reproduce into yet another project.
 
 ### How to Port
 
-1. Copy two files into the new project — anywhere you like:
-   - `cortex.md` (this file — the operating manual)
-   - `README.md` (the quick-start)
-2. Tell the agent: **"Read and act on `[path-to]/cortex.md`"** — This loads the DNA. The agent now understands the trigger system. The verb "act on" is critical — "read and follow" causes agents to acknowledge the file without executing its instructions.
-3. Type `::genesis` — the agent auto-detects where cortex.md lives (CORTEX_ROOT), creates the data layer as a sibling directory, interviews the user, generates vision.md, scans the project, self-tests, and writes the birth diary.
+1. Get cortex.md into the new project — two options:
+   - **Upload:** Download `cortex.md` from the GitHub repo, upload it to the project
+   - **Paste this into chat:** `Fetch https://raw.githubusercontent.com/dvn66/cortex/main/cortex.md, save it to this project, read it, and run ::genesis`
+2. If you uploaded the file, tell the agent: **"Read and act on cortex.md"** — then type `::genesis`. The verb "act on" is critical — "read and follow" causes agents to acknowledge the file without executing its instructions.
+3. Genesis auto-detects where cortex.md lives (CORTEX_ROOT), creates the data layer as a sibling directory, interviews the user, generates vision.md, scans the project, self-tests, and writes the birth diary.
 
 That's it. No prescribed directory structure. No files to pre-create. The new Cortex is fully functional and can itself be ported to yet another project.
 
@@ -397,14 +396,14 @@ The only platform-specific piece is the bootstrap hook — the file where the ag
 
 The bootstrap template content stays the same across platforms — only the target file and the path to cortex.md change. The path in the bootstrap must point to wherever cortex.md actually lives in the project.
 
-**Restricted file system platforms:** Some platforms (e.g., Base44) only allow writes to specific directories. On these platforms, place the DNA files inside an allowed directory and use that as CORTEX_ROOT. For Base44, use `agents/cortex/` — genesis copies the DNA there and builds the data layer under `agents/cortex/data/`. The bootstrap points to that path.
+**Restricted file system platforms:** Some platforms (e.g., Base44) only allow writes to specific directories. On these platforms, place cortex.md inside an allowed directory and use that as CORTEX_ROOT. For Base44, use `agents/cortex/` — genesis copies the DNA there and builds the data layer under `agents/cortex/data/`. The bootstrap points to that path.
 
 ## Genesis Protocol
 
 Genesis has five phases. Each phase completes before the next begins. Every question asked must produce something the system uses — no conversation for conversation's sake.
 
 **Prerequisites:**
-- cortex.md and README.md must exist somewhere in the project. Genesis auto-detects where they are.
+- cortex.md must exist somewhere in the project. Genesis auto-detects where it is.
 - The agent must have already read this file (cortex.md) in the current session. If the agent doesn't recognize `::genesis`, the user needs to point the agent to cortex.md first.
 - See **Portability > How to Port** for the full setup sequence.
 
@@ -412,13 +411,13 @@ Genesis has five phases. Each phase completes before the next begins. Every ques
 
 1. Verify this is intentional (respond: "Birth Cortex here? This creates the data layer and configures the system. Type 'yes' to confirm.")
 2. **Resolve CORTEX_ROOT** — the directory containing this file (cortex.md). All paths below are relative to CORTEX_ROOT. Report: "CORTEX_ROOT: [resolved path]"
-3. Detect platform automatically (check for replit.md, CLAUDE.md, .cursorrules, .windsurfrules, or Base44's `agents/` directory). Report which platform was detected. If the platform has a restricted file system (see Platform Adaptation), relocate the DNA: copy cortex.md and README.md into the allowed directory (e.g., `agents/cortex/` on Base44), update CORTEX_ROOT to that path, and report the relocation.
+3. Detect platform automatically (check for replit.md, CLAUDE.md, .cursorrules, .windsurfrules, or Base44's `agents/` directory). Report which platform was detected. If the platform has a restricted file system (see Platform Adaptation), relocate the DNA: copy cortex.md into the allowed directory (e.g., `agents/cortex/` on Base44), update CORTEX_ROOT to that path, and report the relocation.
 4. Create: data/diary/, data/principles/, data/memory/, data/projects/, data/triggers/, data/templates/, data/archive/
 5. Create empty seed files: data/principles/goals.md, data/principles/constraints.md, data/principles/best-practices.md, data/memory/active.md, data/memory/lessons.md, data/vocabulary.md, data/triggers/local.md (with header: "# Local Triggers\n\nInstall-specific triggers for this project. These do not travel with the Cortex DNA.\nFormat: same as cortex.md triggers (#### ::code, Purpose, Prompt to self).\n")
 6. Create data/what-is-cortex.md from template (section below)
 7. Create data/birth-story.md
 8. Add Cortex bootstrap to the detected platform's agent context file — use the exact template from the **Bootstrap Restoration** section below. The path in the bootstrap must point to CORTEX_ROOT/cortex.md.
-9. Do NOT modify cortex.md or README.md — those are the DNA, already present.
+9. Do NOT modify cortex.md — it is the DNA, already present.
 
 ### Phase 2: Interview (3 questions)
 
@@ -540,7 +539,7 @@ It solves three problems:
 ## How It Works
 
 The system has two layers:
-- **DNA** (cortex.md + README.md) — The portable core. Contains all trigger definitions, prompts, protocols, and behavioral rules. Carry these two files to any project.
+- **DNA** (cortex.md) — The portable core. Contains all trigger definitions, prompts, protocols, and behavioral rules. Carry this one file to any project.
 - **Data layer** (data/) — The memories. Diary entries, principles, vision, active memory, lessons learned. Generated by genesis, unique to each project.
 
 ## Triggers
@@ -609,4 +608,4 @@ If the Cortex section in the agent context file is missing or damaged, the user 
 | v1.3.0 | 2026-02-08 | Optional Deep Seeding phase (3b) in genesis — reads project docs, suggests initial principles/vocabulary/lessons with separate permission gate. Phase 3 scan now enumerates knowledge sources. |
 | v1.2.0 | 2026-02-08 | Diary consolidation protocol (60-day threshold, monthly summaries, archive originals, human-in-the-loop). Vocabulary populated. Memory Aging Protocol restructured. |
 | v1.1.0 | 2026-02-08 | Local triggers system, upgraded ::proj with interview flow and template composition, ::release workflow, lessons.md seeded with first entries. |
-| v1.0.0 | 2026-02-07 | Initial release. Two-file DNA (cortex.md + README.md), genesis protocol with 5 phases, CORTEX_ROOT auto-detection, vision.md generated during genesis, trigger system, memory architecture (RAM/disk/working set), project tracking, concept dictionary, portability across platforms. |
+| v1.0.0 | 2026-02-07 | Initial release. Single-file DNA (cortex.md), genesis protocol with 5 phases, CORTEX_ROOT auto-detection, vision.md generated during genesis, trigger system, memory architecture (RAM/disk/working set), project tracking, concept dictionary, portability across platforms. |

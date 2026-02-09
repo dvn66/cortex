@@ -1,6 +1,6 @@
 # Cortex
 
-Persistent memory for AI coding agents. Two files, any platform, zero dependencies.
+Persistent memory for AI coding agents. One file, any platform, zero dependencies.
 
 ## The Problem
 
@@ -18,21 +18,21 @@ Cortex gives your agent a structured memory system that survives session resets.
 
 ## How It Works
 
-Cortex is two markdown files. That's the whole product.
+Cortex is one file: **cortex.md** — the operating manual. It contains everything an AI agent needs to birth, boot, and run a persistent memory system. Trigger definitions, memory architecture, behavioral rules, genesis protocol — all in one portable markdown file.
 
-- **cortex.md** — The operating manual. Trigger definitions, memory architecture, behavioral rules, genesis protocol.
-- **README.md** — This file. Quick-start guide.
-
-Drop them into a project. Tell your agent to read cortex.md. Run `::genesis`. The agent builds its own memory layer and starts capturing knowledge immediately.
-
-No database. No API keys. No build step. No vendor lock-in. Just files your agent reads and writes.
+No database. No API keys. No build step. No vendor lock-in. Just a file your agent reads and writes.
 
 ## Quick Start
 
+**Option 1 — Upload the file:**
+1. Download `cortex.md` from this repo
+2. Upload it to your project
+3. Tell your agent: "Read and act on cortex.md"
+4. Type `::genesis`
+
+**Option 2 — Paste this into chat** (for platforms that don't support .md uploads):
 ```
-1. Copy cortex.md and README.md into your project (anywhere — Cortex auto-detects its location)
-2. Tell your agent: "Read and act on cortex.md"
-3. Type ::genesis
+Fetch https://raw.githubusercontent.com/dvn66/cortex/main/cortex.md, save it to this project, read it, and run ::genesis
 ```
 
 Genesis runs a short interview (3 questions), scans your project (with permission), and creates the data layer. Takes about 2 minutes.
@@ -72,16 +72,9 @@ System prompts don't learn. They're static. Cortex is living — it grows with y
 - **Fewer false starts:** Principles and lessons prevent the agent from re-proposing approaches you already rejected
 - **Self-correcting:** Internal diagnostics detect when the agent has drifted from protocol
 
-## What's in the Box
+## What Cortex Creates
 
-```
-cortex.md          ← The DNA (operating manual, ~480 lines)
-README.md          ← This file
-LICENSE            ← MIT
-.gitignore         ← Excludes data/ (your memories are project-specific)
-```
-
-After genesis, Cortex creates a `data/` directory alongside the DNA:
+After genesis, Cortex creates a `data/` directory alongside cortex.md:
 
 ```
 data/
