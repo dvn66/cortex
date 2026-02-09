@@ -1,0 +1,5 @@
+## Findings
+
+| Finding | Severity | Resolution |
+|---------|----------|------------|
+|         |          |            |

@@ -1,4 +1,4 @@
-# Cortex v1.2.0
+# Cortex v1.3.0
 
 ## System Definition
 
@@ -430,19 +430,71 @@ Ask: **"I'd like to look around the project now — scan the file structure, che
 
 If yes, perform the scan and report results conversationally as they're found:
 1. **File structure** — language, framework, key directories. Report: "Found a [language]/[framework] project..."
-2. **Documentation** — scan for docs/, PRDs, READMEs, design files. Report: "Found [N] documents in [location]..."
+2. **Documentation** — scan for docs/, PRDs, READMEs, design files, ADRs (architecture decision records). Enumerate each discoverable file by name and location. Report: "Found [N] documents in [location]: [list]..."
 3. **Git history** — author count, age, commit frequency. Report: "Git shows [details]..."
 4. **Dependencies** — package manager, key libraries. Report: "Using [key dependencies]..."
-5. **Existing conventions** — code style, patterns, architecture. Report: "Noticed [patterns]..."
+5. **Existing conventions** — code style, patterns, architecture, error handling, naming conventions, testing patterns. Report: "Noticed [patterns]..."
 
-Write findings to `data/memory/active.md` under a "## Project Scan" section.
+Write findings to `data/memory/active.md` under a "## Project Scan" section. Include the enumerated list of discovered knowledge sources (documentation files, READMEs, config files with embedded conventions) — this list informs the Deep Seeding offer in Phase 3b.
 
 After the scan, ask **1-2 follow-up questions** that are specific to what was discovered — questions that couldn't have been asked before the scan. Examples:
 - "I see 12 PRDs in docs/. Should I absorb those into memory, or are some outdated?"
 - "There's a test infrastructure but no CI config. Is automated testing a priority?"
 - "The codebase has two competing patterns for [X]. Which do you prefer?"
 
-Only ask follow-ups if the scan surfaced something genuinely ambiguous. If everything is clear, skip to Phase 4.
+Only ask follow-ups if the scan surfaced something genuinely ambiguous. If everything is clear, proceed to Phase 3b.
+
+### Phase 3b: Deep Seeding (Optional)
+
+**This phase is entirely optional.** It only runs if the Phase 3 scan discovered knowledge sources (documentation, PRDs, READMEs, architecture files, code conventions) worth reading in depth. If no meaningful sources were found, skip to Phase 4.
+
+**Guard:** This phase requires its own explicit permission — the Phase 3 consent does not carry over. The scan looked at the project surface; deep seeding reads and interprets content.
+
+Ask: **"The scan found [N] knowledge sources — [brief list: e.g., '3 PRDs, 2 READMEs, an architecture doc']. I can read through them and suggest initial principles, vocabulary, and lessons to give Cortex a running start. This is optional — nothing gets written without your approval. Want me to take a look?"**
+
+If no, skip to Phase 4. If yes:
+
+1. **Read discovered sources.** Read each enumerated document and code convention file identified in Phase 3. Focus on extractable knowledge: stated goals, design decisions, constraints, naming conventions, architectural patterns, domain vocabulary, past lessons.
+
+2. **Draft suggestions.** Group extracted knowledge by destination:
+   - **Candidate goals** → would go in `data/principles/goals.md`
+   - **Candidate constraints** → would go in `data/principles/constraints.md`
+   - **Candidate best practices** → would go in `data/principles/best-practices.md`
+   - **Candidate vocabulary** → would go in `data/vocabulary.md`
+   - **Candidate lessons** → would go in `data/memory/lessons.md`
+
+3. **Present for approval.** Show all suggestions grouped by category. Format:
+   ```
+   ## Suggested Seeds ([N] total)
+
+   ### Goals ([N])
+   - [suggestion 1]
+   - [suggestion 2]
+
+   ### Constraints ([N])
+   - [suggestion 1]
+
+   ### Best Practices ([N])
+   - [suggestion 1]
+
+   ### Vocabulary ([N])
+   - [term] — [definition]
+
+   ### Lessons ([N])
+   - [lesson]
+
+   Approve all, cherry-pick, or skip?
+   ```
+
+4. **Write approved items only.** Append approved items to the appropriate data layer files. Tag each with `[genesis-seeded]` and today's date so they're distinguishable from organically captured knowledge. Example: `- **Error boundaries (2026-02-08) [genesis-seeded]:** All React components must have error boundaries at route level.`
+
+5. **Report.** Respond: "Seeded [N] items: [N] goals, [N] constraints, [N] best practices, [N] vocabulary terms, [N] lessons." If the user skipped or cherry-picked, note what was excluded: "Skipped [N] suggestions."
+
+**Rules:**
+- **Never auto-write.** Every suggestion must be presented and approved before being written.
+- **No duplicates.** If a suggestion overlaps with something already captured in Phase 2 (e.g., the project purpose in goals.md), skip it.
+- **Synthesis, not copying.** Extracted items should be distilled and actionable — not raw quotes from documents. Follow Behavioral Rule 9: "said better," not "said in academese."
+- **Source attribution.** When presenting suggestions, note which source each came from so the user can judge relevance: "From docs/architecture.md: [suggestion]."
 
 ### Phase 4: Self-Test
 
@@ -550,6 +602,7 @@ If the Cortex section in the agent context file is missing or damaged, the user 
 
 | Version | Date | Summary |
 |---------|------|---------|
+| v1.3.0 | 2026-02-08 | Optional Deep Seeding phase (3b) in genesis — reads project docs, suggests initial principles/vocabulary/lessons with separate permission gate. Phase 3 scan now enumerates knowledge sources. |
 | v1.2.0 | 2026-02-08 | Diary consolidation protocol (60-day threshold, monthly summaries, archive originals, human-in-the-loop). Vocabulary populated. Memory Aging Protocol restructured. |
 | v1.1.0 | 2026-02-08 | Local triggers system, upgraded ::proj with interview flow and template composition, ::release workflow, lessons.md seeded with first entries. |
 | v1.0.0 | 2026-02-07 | Initial release. Two-file DNA (cortex.md + README.md), genesis protocol with 5 phases, CORTEX_ROOT auto-detection, vision.md generated during genesis, trigger system, memory architecture (RAM/disk/working set), project tracking, concept dictionary, portability across platforms. |
