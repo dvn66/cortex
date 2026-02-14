@@ -79,6 +79,7 @@ Cortex works with any AI coding assistant that reads a context file. Genesis aut
 | VibeCodeApp | Mobile/Web | TBD | -- | -- | -- | -- | -- | -- | -- |
 | Cline | VS Code ext | TBD | -- | -- | -- | -- | -- | -- | -- |
 | Aider | Terminal CLI | TBD | -- | -- | -- | -- | -- | -- | -- |
+| Base44 | Cloud platform | N/A | Fail | N/A | N/A | N/A | N/A | N/A | Incompatible |
 
 **Scoring:** Pass / Partial (works with workaround) / Fail / N/A / -- (not yet tested)
 **Verdict:** Compatible (T1-T6 all Pass/Partial) | Usable (T1-T4 Pass/Partial) | Incompatible (T1 or T2 Fail)
