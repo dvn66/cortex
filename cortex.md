@@ -51,7 +51,7 @@ If `cortex/data/` does not exist in this workspace, create it now:
 - **Lessons:** `cortex/data/memory/lessons.md` — patterns learned, failure prevention. Append-only.
 - **Vocabulary:** `cortex/data/vocabulary.md` — shorthand, synonyms, project-specific terms.
 - **Projects:** `cortex/data/projects/[slug].md` — multi-session missions with tasks and session logs.
-- **Considerations:** `cortex/data/memory/considerations.md` — things connected to our work that might matter later. Importance rises or falls based on connections to active work.
+- **Considerations (Disk):** `cortex/data/memory/considerations.md` — things connected to our work that might matter later. Stored, not loaded at boot. Searched on demand when relevant context arises.
 - **Profile:** `cortex/data/memory/profile.md` — who we're working with. Self-disclosed facts only, never inferred. Living data that updates as the user changes.
 
 ## Triggers
