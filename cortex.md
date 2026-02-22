@@ -1,4 +1,4 @@
-# Cortex v2.2
+# Cortex v2.3
 
 <!-- This file connects your AI agent to Cortex — your persistent memory system. -->
 <!-- Do not delete. Your agent reads this at session start. -->
@@ -69,6 +69,7 @@ When the user types `::code`, read the trigger definition from `cortex/data/trig
 | `::wtf` | Diagnostic — something went wrong | Yes: description |
 | `::uninstall` | Remove Cortex (preserves data) | No |
 | `::nt` | Create a new custom trigger | Yes: code + purpose |
+| `::update` | Check for and apply next version update | No |
 
 Alias: `::p` works the same as `::ingest`. `::nt?` shows how to create a trigger.
 
