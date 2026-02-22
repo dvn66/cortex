@@ -1,4 +1,4 @@
-# Cortex v2.1
+# Cortex v2.2
 
 <!-- This file connects your AI agent to Cortex — your persistent memory system. -->
 <!-- Do not delete. Your agent reads this at session start. -->
@@ -11,27 +11,21 @@ You have access to Cortex, a persistent memory system that survives session rese
 
 If `cortex/data/` does not exist in this workspace, create it now:
 
-1. Create these directories: `cortex/data/diary/`, `cortex/data/principles/`, `cortex/data/memory/`, `cortex/data/projects/`, `cortex/data/triggers/`, `cortex/data/templates/`, `cortex/data/archive/`
-2. Create empty seed files:
-   - `cortex/data/principles/goals.md` — `# Goals`
-   - `cortex/data/principles/rules.md` — `# Rules`
-   - `cortex/data/memory/active.md` — `# Active Memory`
-   - `cortex/data/memory/lessons.md` — `# Lessons`
-   - `cortex/data/vocabulary.md` — `# Vocabulary`
-   - `cortex/data/memory/profile.md` — `# Profile`
-   - `cortex/data/memory/considerations.md` — `# Considerations`
-3. Copy the trigger definitions from the Triggers section below into `cortex/data/triggers/standard.md`
-4. Ask the user: "What's this project about, in a sentence?" — write the answer to `cortex/data/principles/goals.md`
-5. Ask: "Should I actively capture principles and patterns as we work, or wait for you to flag them?" — write preference to `cortex/data/principles/rules.md`
+1. Create these directories: `cortex/data/system/`, `cortex/data/diary/`, `cortex/data/principles/`, `cortex/data/memory/`, `cortex/data/projects/`, `cortex/data/triggers/`, `cortex/data/templates/`, `cortex/data/archive/`
+2. Fetch the seed manifest from `https://raw.githubusercontent.com/dvn66/cortex/main/seed-manifest.json` and create all files listed in it. If fetch fails, ask the user to paste the seed manifest content.
+3. After seeding, read `cortex/data/system/genesis.md` and execute the interview steps (project context, working style preference).
+4. Write the first diary entry recording the genesis.
 
 ### Every Session
 
-1. Read `cortex/data/memory/active.md`, `cortex/data/memory/lessons.md`, `cortex/data/vocabulary.md`
-2. Read `cortex/data/memory/profile.md` — calibrate communication to match the user's current level, preferences, and working style. Profile calibrates; it does not constrain.
-3. Read all principles files that exist in `cortex/data/principles/` — this includes `goals.md`, `rules.md`, `constraints.md`, and `best-practices.md`. Read whichever are present.
-4. Scan `cortex/data/projects/` for files with `Status: active`
-5. Read trigger definitions from `cortex/data/triggers/standard.md`. Also read `cortex/data/triggers/local.md` if it exists — these are install-specific triggers.
-6. Enter **monitoring mode** — watch all conversation for goals, rules, lessons, vocabulary, and profile self-disclosures. When found, write to the appropriate file in `cortex/data/`. Briefly note what was captured.
+1. Read `cortex/data/system/rules.md` — these are your operating rules.
+2. Read `cortex/data/system/architecture.md` — understand the memory tiers.
+3. Read `cortex/data/memory/active.md`, `cortex/data/memory/lessons.md`, `cortex/data/vocabulary.md`.
+4. Read `cortex/data/memory/profile.md` if it exists — calibrate communication to match the user's level and working style. Profile calibrates; it does not constrain.
+5. Read all files in `cortex/data/principles/` — goals and rules. Read whichever are present.
+6. Scan `cortex/data/projects/` for files with `Status: active`.
+7. Read trigger definitions from `cortex/data/triggers/standard.md`. Also read `cortex/data/triggers/custom.md` if it exists.
+8. Enter **monitoring mode** — watch all conversation for goals, rules, lessons, vocabulary, and profile self-disclosures. When found, write to the appropriate file in `cortex/data/`. Briefly note what was captured.
 
 ### Rules
 
@@ -45,7 +39,7 @@ If `cortex/data/` does not exist in this workspace, create it now:
 
 ### Memory Architecture
 
-- **Principles (RAM):** `cortex/data/principles/` — always loaded. Goals, rules (or constraints + best-practices), lessons. Permanent, append-only.
+- **Principles (RAM):** `cortex/data/principles/` — always loaded. Goals and rules. Permanent, append-only.
 - **Diary (Disk):** `cortex/data/diary/YYYY/MM/DD.md` — one file per day. Permanent. Only most recent read at session start.
 - **Active Memory (Working Set):** `cortex/data/memory/active.md` — where we left off, open issues, next steps. Updated each session.
 - **Lessons:** `cortex/data/memory/lessons.md` — patterns learned, failure prevention. Append-only.
@@ -56,14 +50,15 @@ If `cortex/data/` does not exist in this workspace, create it now:
 
 ## Triggers
 
-When the user types `::code`, read the trigger definition from `cortex/data/triggers/standard.md` (and `local.md` if it exists) and execute it. Any trigger with `?` appended shows brief usage help.
+When the user types `::code`, read the trigger definition from `cortex/data/triggers/standard.md` (or `custom.md`) and execute it. Any trigger with `?` appended shows brief usage help.
 
 ### Trigger Index
 
 | Code | Purpose | Payload |
 |------|---------|---------|
-| `::ss` | Session start — full briefing, load principles | No |
+| `::ss` | Session start — full briefing, run ::lt, activate monitoring | No |
 | `::se` | Session end — diary, projects, memory sync | No |
+| `::lt` | Live test — health check, verify Cortex integrity | No |
 | `::?` | List all triggers | No |
 | `::n` | Capture a note to diary | Yes: text |
 | `::d` | Write diary narrative | No |
