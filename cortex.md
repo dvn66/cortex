@@ -1,4 +1,4 @@
-# Cortex v2.3
+# Cortex v2.4
 
 <!-- This file connects your AI agent to Cortex — your persistent memory system. -->
 <!-- Do not delete. Your agent reads this at session start. -->
@@ -18,14 +18,24 @@ If `cortex/data/` does not exist in this workspace, create it now:
 
 ### Every Session
 
-1. Read `cortex/data/system/rules.md` — these are your operating rules.
-2. Read `cortex/data/system/architecture.md` — understand the memory tiers.
-3. Read `cortex/data/memory/active.md`, `cortex/data/memory/lessons.md`, `cortex/data/vocabulary.md`.
-4. Read `cortex/data/memory/profile.md` if it exists — calibrate communication to match the user's level and working style. Profile calibrates; it does not constrain.
-5. Read all files in `cortex/data/principles/` — goals and rules. Read whichever are present.
-6. Scan `cortex/data/projects/` for files with `Status: active`.
-7. Read trigger definitions from `cortex/data/triggers/standard.md`. Also read `cortex/data/triggers/custom.md` if it exists.
-8. Enter **monitoring mode** — watch all conversation for goals, rules, lessons, vocabulary, and profile self-disclosures. When found, write to the appropriate file in `cortex/data/`. Briefly note what was captured.
+Load the eager set in **a single parallel tool round**, not sequentially. The eager set is intentionally minimal — everything else loads on demand.
+
+**Eager batch (one parallel round — the entire boot read set):**
+- `cortex/data/system/rules.md` — operating rules
+- `cortex/data/triggers/standard.md` and `cortex/data/triggers/custom.md` (if present) — trigger definitions
+- `cortex/data/memory/active.md` — where we left off
+- The most recent diary entry (`cortex/data/diary/YYYY/MM/DD.md`) — continuity
+
+**Deferred (do NOT load at boot; read only when referenced):**
+- `cortex/data/system/architecture.md` — when explaining Cortex internals
+- `cortex/data/memory/profile.md` — when communication calibration matters or a self-disclosure surfaces
+- All files in `cortex/data/principles/` — when capturing or referencing a principle
+- `cortex/data/memory/lessons.md` — when a failure pattern surfaces or a new lesson is being written
+- `cortex/data/vocabulary.md` — when an unfamiliar term appears or new vocabulary is being added
+- `cortex/data/memory/considerations.md` — when relevant context arises
+- All files in `cortex/data/projects/` — when the user runs `::proj`, references project work, or asks for the full briefing
+
+Then enter **monitoring mode** — watch all conversation for goals, rules, lessons, vocabulary, and profile self-disclosures. When found, load the relevant deferred file (if not already loaded) and write the capture. When a single exchange surfaces multiple items, batch all writes in one parallel tool round. Briefly note what was captured.
 
 ### Rules
 
@@ -34,8 +44,9 @@ If `cortex/data/` does not exist in this workspace, create it now:
 3. Active memory (`active.md`) gets updated each session. Lessons are append-only.
 4. Trigger responses are concise. Action, not explanation.
 5. Internal triggers run silently unless the user asks.
-6. Monitoring is always on. Capture knowledge as it emerges — including self-disclosures about the user's background, strengths, limitations, or working style (write to `cortex/data/memory/profile.md`).
+6. Monitoring is always on. Capture knowledge as it emerges — including self-disclosures about the user's background, strengths, limitations, or working style (write to `cortex/data/memory/profile.md`). When a single exchange surfaces multiple items, batch all writes in one parallel tool round.
 7. Profile is calibration. Profile facts calibrate how you communicate, what you assume the user knows, and how you frame decisions. Profile does not constrain capability — match the user's current level and adjust as it changes.
+8. Parallel-by-default. Whenever you have multiple independent reads or writes, issue them in one parallel tool round. Sequential I/O across independent files is a bug.
 
 ### Memory Architecture
 
